@@ -1,0 +1,1 @@
+%SPARK_HOME%/bin/spark-submit --class com.supergloo.SparkCassandra --master local .\build\libs\spark-cassandra-1.0-SNAPSHOT-all.jar

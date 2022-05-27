@@ -1,0 +1,50 @@
+plugins {
+    id "java"
+	id "scala"
+    id "com.github.johnrengelman.shadow" version "1.2.3"
+}
+
+group 'spark.cassandra'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// The assembly configuration will cause jar to be included in assembled fat-jar
+configurations {
+    assembly
+    compile.extendsFrom assembly
+}
+
+configurations {
+    sparkCompile // Configuration for Spark: should be included in the local
+                 // class path both at compilation and at runtime, but should
+                 // be excluded from the fat jar
+    shadowCompile // Configuration for things that should be included in the shadow jar.
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	sparkCompile "org.scala-lang:scala-library:"+scalaVersion
+	sparkCompile "org.scala-lang:scala-reflect:"+scalaVersion
+	sparkCompile "org.scala-lang:scala-compiler:"+scalaVersion
+	sparkCompile "org.apache.spark:spark-sql_2.12:3.1.3"
+	sparkCompile "org.apache.spark:spark-launcher_2.12:3.1.3"
+	sparkCompile "org.apache.spark:spark-catalyst_2.12:3.1.3"
+	sparkCompile "org.apache.spark:spark-streaming_2.12:3.1.3"
+	sparkCompile "org.apache.spark:spark-core_2.12:3.1.3"
+	shadowCompile "com.datastax.spark:spark-cassandra-connector_2.12:3.2.0"
+	shadowCompile "commons-configuration:commons-configuration:1.10"
+}
+
+configurations.compile.extendsFrom configurations.sparkCompile
+configurations.compile.extendsFrom configurations.shadowCompile
+
+
+shadowJar {
+    zip64 true
+    configurations = [project.configurations.shadowCompile] // Exclude runtime-only path
+}
